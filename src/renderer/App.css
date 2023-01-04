@@ -1,0 +1,24 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.yellow-bg {
+  background-color: #ffbf31;
+}
+
+.gray-bg {
+  background-color: #f1f1f1;
+}
+
+.grayish-bg {
+  background-color: #fafbff;
+}
+
+html {
+  background-color: #fafbff;
+}
+
+.max-width-container {
+  max-width: 390px;
+  min-height: 483px;
+}
