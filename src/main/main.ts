@@ -1,3 +1,13 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable import/first */
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable @typescript-eslint/no-redeclare */
+/* eslint-disable prefer-template */
+/* eslint-disable prettier/prettier */
+/* eslint-disable import/order */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 /**
@@ -14,6 +24,8 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+// import { connectToServer } from 'components/socket';
+import { Console } from 'console';
 
 class AppUpdater {
   constructor() {
@@ -24,12 +36,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -56,11 +62,32 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const createWindow = async () => {
-  if (isDebug) {
-    await installExtensions();
-  }
+import net from 'net';
 
+var message: string;
+
+ipcMain.on('ipc-example', async (event, arg) => {
+  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+  console.log(msgTemplate(arg));
+  sendBid(arg);
+  event.reply('ipc-example', message);
+});
+
+const socketClient = net.connect({ host: '127.0.0.1', port: 4545 }, () => {
+  // 'connect' listener
+  console.log('connected to server!');
+  // socketClient.write('user adds new bid');
+  socketClient.on('data', (data) => {
+    console.log(data.toString());
+    message = data.toString();
+  });
+});
+
+const sendBid = (arg: string) => {
+  socketClient.write('new price bid : ' + arg);
+};
+
+const createWindow = async () => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
