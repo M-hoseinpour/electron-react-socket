@@ -67,10 +67,10 @@ import net from 'net';
 var message: string;
 
 ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  sendBid(arg);
-  event.reply('ipc-example', message);
+  socketClient.write(arg[0]);
+  if (arg[0] === 'auctionPrice') {
+    event.reply('ipc-example', message);
+  }
 });
 
 const socketClient = net.connect({ host: '127.0.0.1', port: 4545 }, () => {
@@ -82,10 +82,6 @@ const socketClient = net.connect({ host: '127.0.0.1', port: 4545 }, () => {
     message = data.toString();
   });
 });
-
-const sendBid = (arg: string) => {
-  socketClient.write('new price bid : ' + arg);
-};
 
 const createWindow = async () => {
   const RESOURCES_PATH = app.isPackaged

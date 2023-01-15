@@ -1,11 +1,28 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable react/button-has-type */
+import { useState } from 'react';
 import carImage from '../../assets/images/carImage.png';
 import { ProductInfo } from './ProductInfo';
 import '../renderer/App.css';
 
 export function ProductBid() {
+  const [price, setPrice] = useState('0');
+  const [bidPrice, setBidPrice] = useState(+price);
+  // calling IPC exposed from preload script
+  window.electron.ipcRenderer.once('ipc-example', (arg) => {
+    // eslint-disable-next-line no-console
+    setPrice(arg as string);
+    setBidPrice(+(arg as string));
+  });
+
+  const sendNewBid = (bid: string) => {
+    setBidPrice(+bid);
+    setPrice(bid);
+    window.electron.ipcRenderer.sendMessage('ipc-example', [bid]);
+  };
+
   return (
     <div className="flex justify-center mb-5">
       <div className="md:w-1/3 w-1/2">
@@ -18,7 +35,7 @@ export function ProductBid() {
             <p className="text-xs font-medium text-[#707070]">قیمت پایه :</p>
             <div>
               <span className="text-sm font-bold text-[#212121] ml-1">
-                128,000,000
+                {(+price).toLocaleString()}
               </span>
               <span className="text-[10px] font-normal text-[#A8A8A8]">
                 تومان
@@ -49,20 +66,31 @@ export function ProductBid() {
           </div>
           <div className="flex flex-col items-center mt-auto w-full">
             <div className="flex font-bold text-sm border p-1 items-center rounded-lg w-full h-10 text-[#212121] justify-between">
-              <button className="flex justify-center items-center w-8  h-full gray-bg rounded text-[18px]">
+              <button
+                onClick={() => setBidPrice(bidPrice + 500_000)}
+                className="flex justify-center items-center w-8  h-full gray-bg rounded text-[18px]"
+              >
                 +
               </button>
               <p>
-                225,500,000{' '}
+                {(+bidPrice).toLocaleString()}
                 <span className="text-gray-400 font-thin text-[13px]">
                   تومان
                 </span>
               </p>
-              <button className="flex justify-center items-center w-8  h-full gray-bg rounded text-[18px] text-gray-400">
+              <button
+                onClick={() =>
+                  bidPrice >= +price && setBidPrice(bidPrice - 500_000)
+                }
+                className="flex justify-center items-center w-8  h-full gray-bg rounded text-[18px] text-gray-400"
+              >
                 -
               </button>
             </div>
-            <button className="font-bold text-sm yellow-bg border border-[#FFCC00] rounded-lg w-full h-10 mt-4 text-[#212121]">
+            <button
+              onClick={() => sendNewBid(bidPrice.toString())}
+              className="font-bold text-sm yellow-bg border border-[#FFCC00] rounded-lg w-full h-10 mt-4 text-[#212121]"
+            >
               پیشنهاد قیمت
             </button>
             <div className="w-full flex flex-col mt-4">
