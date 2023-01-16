@@ -4,18 +4,25 @@
 const net = require('net');
 
 const server = net.createServer();
+let sockets = [];
 
 let price = '130000000';
 
 server.on('connection', (socket) => {
   console.log('client connected');
+  sockets.push(socket);
   socket.on('data', (data) => {
     if (data.toString() === 'auctionPrice') {
-      console.log('auction price sent')
+      console.log('auction price sent');
       socket.write(price);
+      // socket.pipe(socket);
     } else {
-      console.log('new price sent')
-      socket.write(data.toString());
+      console.log('new price sent : ', data.toString());
+      sockets.forEach((s) => {
+        s.write(data.toString());
+      });
+      // socket.write(data.toString());
+      // socket.pipe(socket);
     }
   });
 });

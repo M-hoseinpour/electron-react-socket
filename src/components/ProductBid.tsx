@@ -13,6 +13,7 @@ export function ProductBid() {
   // calling IPC exposed from preload script
   window.electron.ipcRenderer.once('ipc-example', (arg) => {
     // eslint-disable-next-line no-console
+    // console.log(arg)
     setPrice(arg as string);
     setBidPrice(+(arg as string));
   });
@@ -93,7 +94,7 @@ export function ProductBid() {
             >
               پیشنهاد قیمت
             </button>
-            <div className="w-full flex flex-col mt-4">
+            {/* <div className="w-full flex flex-col mt-4">
               <div className="flex justify-between mb-1">
                 <p>بیشترین قیمت</p>
               </div>
@@ -121,7 +122,7 @@ export function ProductBid() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
